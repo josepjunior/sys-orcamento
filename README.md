@@ -1,43 +1,51 @@
-## About CQRS - Command Query Responsibility Segregation
+# Criando um sistema de orçamento, utilizando CQRS, Quarkus, Kafka e deploy EKS
 
-According with [Martin Folwer](https://martinfowler.com/bliki/CQRS.html) 
-> At its heart is the notion that you can use a different model to update information than the model you use to read information. 
-> For some situations, this separation can be valuable, but beware that for most systems CQRS adds risky complexity.
+### Objetivo: Projeto desenvolvido para aplicação de conhecimentos no Bootcamp Banco Inter da Digital Innovation One:
 
-## The application
+## Stack utilizada
+  * Banco de dados PostgreSQL
+  * Elastic Search
+  * Kubernetes
+  * Kafka Server
+  * Quarkus
+  * Docker
 
-Simulates a bank account scenario where an end user adds a income or expense transaction, and it is processed in a ascyncronous event sourcing and CQRS architecture to recalculate the user's bank account balance. The user can also request the balance of it's account. Down here you can see the design:
+## Sobre Segregação de responsabilidade de consulta de comando (Command Query Responsibility Segregation - CQRS)
 
-![Design](/images/design.png)
+De acordo com [Martin Folwer] (https://martinfowler.com/bliki/CQRS.html)
+> Em seu cerne está a noção de que você pode usar um modelo diferente para atualizar informações do modelo que você usa para ler informações.
+> Para algumas situações, essa separação pode ser valiosa, mas é necessário atenção, pois para a maioria dos sistemas, CQRS adiciona complexidade arriscada.
 
-## Deploying the external services
+## A aplicação
+
+Simula um cenário de conta bancária em que um usuário final adiciona uma transação de receita ou despesa e é processado em uma fonte de eventos ascíncrona e arquitetura CQRS para recalcular o saldo da conta bancária do usuário. O usuário também pode solicitar o saldo de sua conta.
+
+## Implantar os serviços externos
 
 ```
 docker-compose up -d --build
 ```
-It will deploy four docker containers on your environment with MongoDB, PostgreSQL, Kafka and Zookepper (required by Kafka)
 
-After deploying Kafka, you'll need to [create the topic on the Kafka cluster](https://kafka.apache.org/quickstart).
+Ele implantará quatro contêineres docker em seu ambiente com MongoDB, PostgreSQL, Kafka e Zookepper (exigido por Kafka)
 
-## Testing the application
+Depois de implantar o Kafka, você precisará [criar o tópico no cluster Kafka](https://kafka.apache.org/quickstart).
 
-#### Running a CURL request to create a income transaction
+## Testando o aplicativo
+
+#### Executando uma solicitação CURL para criar uma transação de receita
 ```
-curl -X POST -H "Content-Type: application/json" -d @income-transaction.json http://localhost:8080/transactions
+curl -X POST -H "Content-Type: application/json" -d @ income-transaction.json http://localhost:8080/transactions
 ```
-#### Running a CURL request to create a expense transaction
+#### Executando uma solicitação CURL para criar uma transação de despesas
 ```
-curl -X POST -H "Content-Type: application/json" -d @expense-transaction.json http://localhost:8080/transactions
+curl -X POST -H "Content-Type: application/json" -d @ expens-transaction.json http://localhost:8080/transactions
 ```
-#### Running CURL request to fetch the balance
+#### Executando solicitação CURL para buscar o equilíbrio
 ```
-curl http://localhost:8081/balance\?accountId\=wesley | json_pp
+curl http://localhost:8081/balance\?accountId\=wesley|json_pp
 ```
-#### Running [K6's](https://k6.io) simple performance test
+#### Executando [K6's] (https://k6.io) teste de desempenho simples
 ````
 k6 run --vus 10 --duration 60s performance-tests/income.js
-k6 run --vus 10 --duration 60s performance-tests/expense.js
+k6 run --vus 10 --duration 60s performance-tests/expens.js
 ````
-
-### Contributing
-I'd love to have a frontend for it! [Please reach me out if you got interested](MailTo:wesley.fuchter@gmail.com)
